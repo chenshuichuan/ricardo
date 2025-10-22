@@ -6,6 +6,7 @@ node_modules
 # Production
 dist
 cache
+public
 
 # VitePress
 .vitepress/cache
@@ -41,6 +42,6 @@ Thumbs.db
 
 # Lock files
 # Uncomment if you want to ignore package-lock.json
-# package-lock.json
-# yarn.lock
-# pnpm-lock.yaml 
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
