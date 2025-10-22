@@ -1,40 +1,7 @@
-# VitePress Documentation Template
+# vuepress-reco
+一款简洁的 vuepress 博客 & 文档 主题。
 
-A clean and customizable VitePress documentation template with a well-organized structure and modern design.
-
-## Deploy
-Deploy with EdgeOne Pages.
-
-[![EdgeOne Pages deploy](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?template=vitepress-template)
-
-## Features
-
-- 📚 Well-organized documentation structure
-- 🎨 Customized theme and styling
-- 📱 Responsive design
-- 🔍 Full-text search
-- 📦 Easy to deploy
-- 🚀 Fast and lightweight
-
-## Directory Structure
-
-```
-.
-├── .vitepress/          # VitePress configuration
-│   ├── config.mts       # Site configuration
-│   └── theme/           # Custom theme files
-│       └── style.css    # Custom styles
-├── pages/              # Documentation pages
-│   ├── index.md        # Home page
-│   ├── quick-start/    # Quick start guide
-│   ├── advanced/       # Advanced topics
-│   ├── deployment/     # Deployment guides
-│   └── examples/       # Examples
-├── dist/               # Build output directory
-├── package.json        # Project dependencies
-├── edgeone.json        # Project deployment parameters
-└── .gitignore         # Git ignore rules
-```
+vuepress-theme-reco 2.0 继续坚持简洁的风格，所有功能开箱即用，首页模块化组装，使用 tailwindcss 书写样式，将 Vite 作为默认编译器。你只需要负责内容创作，其他请交给我。
 
 ## Getting Started
 

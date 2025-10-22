@@ -1,6 +1,7 @@
-# VitePress 文档模板
+# vuepress-reco
+一款简洁的 vuepress 博客 & 文档 主题。
 
-一个简洁可定制的 VitePress 文档模板，具有良好的组织结构和现代化设计。
+vuepress-theme-reco 2.0 继续坚持简洁的风格，所有功能开箱即用，首页模块化组装，使用 tailwindcss 书写样式，将 Vite 作为默认编译器。你只需要负责内容创作，其他请交给我。
 
 ## 部署
 部署到 EdgeOne Pages。
@@ -21,16 +22,13 @@
 ```
 .
 ├── .vitepress/          # VitePress 配置
-│   ├── config.mts       # 站点配置
+│   ├── config.ts       # 站点配置
 │   └── theme/           # 自定义主题文件
 │       └── style.css    # 自定义样式
-├── pages/              # 文档页面
-│   ├── index.md        # 首页
-│   ├── quick-start/    # 快速开始指南
-│   ├── advanced/       # 进阶主题
-│   ├── deployment/     # 部署指南
-│   └── examples/       # 示例
-├── dist/               # 构建输出目录
+├── docs/              # 文档页面
+│   ├── home.md        # 首页
+
+├── public/               # 构建输出目录
 ├── package.json        # 项目依赖
 ├── edgeone.json        # 项目部署参数
 └── .gitignore         # Git 忽略规则
