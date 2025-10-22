@@ -6,7 +6,6 @@ node_modules
 # Production
 dist
 cache
-public
 
 # VitePress
 .vitepress/cache
