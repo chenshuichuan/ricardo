@@ -4,13 +4,13 @@ import { viteBundler } from '@vuepress/bundler-vite'
 import { webpackBundler } from '@vuepress/bundler-webpack'
 
 export default defineUserConfig({
-  title: "vuepress-theme-reco",
-  description: "Just playing around",
+  title: "Ricardo的奇妙屋",
+  description: "",
   bundler: viteBundler(),
   // bundler: webpackBundler(),
   theme: recoTheme({
     logo: "/logo.png",
-    author: "reco_luan",
+    author: "ricardo",
     authorAvatar: "/head.png",
     docsRepo: "https://github.com/vuepress-reco/vuepress-theme-reco-next",
     docsBranch: "main",
@@ -30,11 +30,11 @@ export default defineUserConfig({
       ],
     },
     navbar: [
-      { text: "Home", link: "/" },
-      { text: "Categories", link: "/categories/reco/1.html" },
-      { text: "Tags", link: "/tags/tag1/1.html" },
+      { text: "首页", link: "/" },
+      { text: "分类", link: "/categories/reco/1.html" },
+      { text: "标签", link: "/tags/tag1/1.html" },
       {
-        text: "Docs",
+        text: "文档",
         children: [
           { text: "vuepress-reco", link: "/docs/theme-reco/theme" },
           { text: "vuepress-theme-reco", link: "/blogs/other/guide" },
