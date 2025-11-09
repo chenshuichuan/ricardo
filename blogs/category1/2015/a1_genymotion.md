@@ -2,13 +2,12 @@
 title: genymotion 使用过程的若干问题
 date: 2015/08/07
 tags:
- - 移动端
- - 工具
- - 杂谈
-categories:
   - Android
   - tools
-
+categories:
+  - 移动端
+  - 工具
+  - 杂谈
 ---
 genymotion 使用过程的若干问题
 
@@ -20,9 +19,5 @@ genymotion 使用过程的若干问题
 参考：http://blog.csdn.net/chenyufeng1991/article/details/47271369
 
 2）打开你自己电脑的 cmd（命令行）和virtualBOX 的
-图片1
-![本地网络配置1](/public/old/a1_01.png "本地网络配置")
-
-图片2
-![本地网络配置2](../../../public/old/a1_01.png "本地网络配置")
+![本地网络配置2](/old/a1_01.png "本地网络配置2")
 
