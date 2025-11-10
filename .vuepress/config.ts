@@ -12,6 +12,7 @@ export default defineUserConfig({
     logo: "/logo.png",
     author: "ricardo",
     authorAvatar: "/head.png",
+    home: '/home.html',
     docsRepo: "https://github.com/vuepress-reco/vuepress-theme-reco-next",
     docsBranch: "main",
     docsDir: "example",
@@ -30,9 +31,9 @@ export default defineUserConfig({
       ],
     },
     navbar: [
-      { text: "首页", link: "/" },
-      { text: "分类", link: "/categories/reco/1.html" },
-      { text: "标签", link: "/tags/tag1/1.html" },
+      { text: "首页", link: "/home.html" },
+      { text: "分类", link: "/categories/AI/1.html" },
+      { text: "标签", link: "/tags/java/1.html" },
       {
         text: "文档",
         children: [
@@ -40,12 +41,13 @@ export default defineUserConfig({
           { text: "vuepress-theme-reco", link: "/blogs/other/guide" },
         ],
       },
+      { text: "关于我", link: "/blogs/other/about.html" }
     ],
     bulletin: {
       body: [
         {
           type: "text",
-          content: `🎉🎉🎉 reco 主题 2.x 已经接近 Beta 版本，在发布 Latest 版本之前不会再有大的更新，大家可以尽情尝鲜了，并且希望大家在 QQ 群和 GitHub 踊跃反馈使用体验，我会在第一时间响应。`,
+          content: `🎉🎉🎉 2025年11月10 个人博客终于完整上线啦！！！！我还把CSDN的博客也迁过来了！！！！。`,
           style: "font-size: 12px;",
         },
         {
@@ -53,15 +55,15 @@ export default defineUserConfig({
         },
         {
           type: "title",
-          content: "QQ 群",
+          content: "欢迎打赏",
         },
         {
           type: "text",
           content: `
           <ul>
-            <li>QQ群1：1037296104</li>
-            <li>QQ群2：1061561395</li>
-            <li>QQ群3：962687802</li>
+            <li>
+            <img src="https://yuanchen.space/wechat.png" alt="wechat" title="wechat">
+            </li>     
           </ul>`,
           style: "font-size: 12px;",
         },
@@ -70,14 +72,14 @@ export default defineUserConfig({
         },
         {
           type: "title",
-          content: "GitHub",
+          content: "感谢开源社区",
         },
         {
           type: "text",
           content: `
           <ul>
-            <li><a href="https://github.com/vuepress-reco/vuepress-theme-reco-next/issues">Issues<a/></li>
-            <li><a href="https://github.com/vuepress-reco/vuepress-theme-reco-next/discussions/1">Discussions<a/></li>
+            <li><a href="https://github.com/vuepress-reco/vuepress-theme-reco-next">博客主题官方<a/>（这个博客主题兼顾了我喜爱的blog和docs的特性）</li>
+            <li><a href="https://www.ruanyifeng.com/blog">阮一峰的网络日志<a/>(我第一次认识到的博客大佬)</li>
           </ul>`,
           style: "font-size: 12px;",
         },
@@ -89,7 +91,7 @@ export default defineUserConfig({
           children: [
             {
               text: "打赏",
-              link: "/docs/others/donate.html",
+              link: "##",
             },
           ],
         },
@@ -102,7 +104,7 @@ export default defineUserConfig({
         appId: 'yMHzjLvXJlDObvbeq5tScJla-MdYXbMMI',
         appKey: '5FkDrutnkxw0iIMrFaMr3Jd3',
         placeholder: '填写邮箱可以收到回复提醒哦！',
-        verify: true, // 验证码服务
+        verify: false, // 验证码服务
         notify: true,
         recordIP: true,
         hideComments: false // 隐藏评论
