@@ -2,10 +2,10 @@
 title: 带链表头指针和尾指针的 list 模板实现
 date: 2016/01/20
 tags:
-  - Cpp
+ - Cpp
 categories:
-  - 后端开发
-  - 算法
+ - 后端开发
+ - 算法
 
 ---
 ### 摘要

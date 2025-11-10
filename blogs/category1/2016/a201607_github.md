@@ -2,10 +2,10 @@
 title: Failed to connect to github.com port 443 Timed out
 date: 2016/06/23
 tags:
-  - git
+ - git
 categories:
-  - 工具
-  - 错误
+ - 工具
+ - 错误
 
 ---
 # fatal: unable to access '' :Failed to connect to github.com port 443: Timed out

@@ -2,11 +2,11 @@
 title: windows8.1+VBox+CentOS共享文件夹
 date: 2017/07/08
 tags:
-  - vbox
-  - 配置
+ - vbox
+ - 配置
 categories:
-  - 工具
-  - 操作系统
+ - 工具
+ - 操作系统
 
 ---
 

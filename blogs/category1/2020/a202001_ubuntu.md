@@ -2,10 +2,10 @@
 title: 树莓派4B安装Ubuntu20.04 解决更换镜像源问题
 date: 2020/06/16
 tags:
-  - ubuntu
-  - 配置
+ - ubuntu
+ - 配置
 categories:
-  - 操作系统
+ - 操作系统
 
 ---
 

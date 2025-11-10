@@ -2,11 +2,11 @@
 title: UDP协议实现对等通讯Java+RSA加密解密传送信息实现
 date: 2016/06/24
 tags:
-  - java
-  - 网络协议
+ - java
+ - 网络协议
 categories:
-  - 后端开发
-  - 算法
+ - 后端开发
+ - 算法
 
 ---
 ### 摘要

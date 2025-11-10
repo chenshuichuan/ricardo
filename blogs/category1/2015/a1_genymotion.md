@@ -2,12 +2,12 @@
 title: genymotion 使用过程的若干问题
 date: 2015/08/07
 tags:
-  - Android
-  - tools
+ - Android
+ - tools
 categories:
-  - 移动端
-  - 工具
-  - 杂谈
+ - 移动端
+ - 工具
+ - 杂谈
 ---
 genymotion 使用过程的若干问题
 
