@@ -2,10 +2,10 @@
 title: oracle 11g 数据库中文字段vs2013 MFC工程 显示乱码解决办法
 date: 2015/12/10
 tags:
- - oracle
- - MFC
- - visual studio
- - 乱码
+  - oracle
+  - MFC
+  - visual studio
+  - 乱码
 categories:
   - 数据库
   - 后端开发

@@ -2,7 +2,7 @@
 title: C++ 实现mystring类型
 date: 2016/01/20
 tags:
-  - C++
+  - Cpp
 categories:
   - 后端开发
   - 算法

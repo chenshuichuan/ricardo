@@ -2,7 +2,7 @@
 title: 有序数组的合并 c++模板实现
 date: 2016/01/20
 tags:
-  - C++
+  - Cpp
 categories:
   - 后端开发
   - 算法
