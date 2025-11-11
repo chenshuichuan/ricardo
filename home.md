@@ -1,4 +1,5 @@
 ---
+title: 心水斤音
 home: true
 modules: # 指定首页展示模块
 - BannerBrand
@@ -17,8 +18,8 @@ banner: # banner 模块的配置
   bgImageStyle:
     height: 450px
 bannerBrand: # bannerBrand 模块的配置
-  title: Ricardo的奇妙屋
-  description: Ricardo的奇妙屋
+  title: 命数如织,当为磐石
+  description: 心水斤音
   tagline: Ricardo的奇妙屋Ricardo的奇妙屋欢迎探索！
   buttons:
     - { text: Guide, link: '/docs/guide/introduce' }

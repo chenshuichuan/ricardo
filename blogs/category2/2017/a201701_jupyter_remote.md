@@ -1,0 +1,42 @@
+---
+title: 在服务器上配置jupyter远程登录
+date: 2017/12/10
+tags:
+ - jupyter
+ - linux
+categories:
+ - 工具
+ - 配置
+
+---
+
+在服务器上配置jupyter, 方便我们远程登录．
+
+第一步：安装jupyter, pip3 install jupyter (此处使用的是python3)
+
+第二步：生成配置文件jupyter notebook --generate-config
+
+第三步：生成密钥　打开python3
+
+```python
+from notebook.auth import passwd
+passwd()
+此时会让你两次输入密码，然后就会生成秘钥
+＊＊＊＊＊＊＊＊＊＊＊＊
+ 
+```
+修改配置文件
+vim ~/.jupyter/jupyter_notebook_config.py
+```python
+c.NotebookApp.ip='*'                                  # 就是设置所有ip皆可访问
+c.NotebookApp.password = u'sha:ce...       # 刚才复制的那个密文'
+c.NotebookApp.open_browser = False       # 禁止自动打开浏览器
+c.NotebookApp.port =8888                         #随便指定一个端口
+
+```
+
+第四步：配置一下路由器的端口转发，
+
+第五步：在服务器端启动 jupyter notebook
+
+第六步：本地地址栏输入服务器ip:8888 就OK了

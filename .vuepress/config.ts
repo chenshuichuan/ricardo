@@ -10,14 +10,16 @@ export default defineUserConfig({
   // bundler: webpackBundler(),
   theme: recoTheme({
     logo: "/logo.png",
-    author: "ricardo",
+    author: "Ricardo",
     authorAvatar: "/head.png",
     home: '/home.html',
-    docsRepo: "https://github.com/vuepress-reco/vuepress-theme-reco-next",
+    docsRepo: "https://github.com/chenshuichuan",
     docsBranch: "main",
-    docsDir: "example",
+    docsDir: "/docs",
     lastUpdatedText: "",
     // series 为原 sidebar
+    // 自动设置分类
+    // autoSetSeries: true,
     series: {
       "/docs/theme-reco/": [
         {
@@ -29,6 +31,16 @@ export default defineUserConfig({
           children: ["api", "plugin"],
         },
       ],
+      "/series/competition/": [
+        {
+          text: "2025南宁AI大赛",
+          children: ["2025静态路径规划", "2025动态路径规划","2025多智能体任务编排"],
+        },
+        {
+          text: "2025阿里百宝箱MCP",
+          children: ["api", "plugin"],
+        },
+      ],
     },
     navbar: [
       { text: "首页", link: "/home.html" },
@@ -37,8 +49,9 @@ export default defineUserConfig({
       {
         text: "文档",
         children: [
-          { text: "vuepress-reco", link: "/docs/theme-reco/theme" },
-          { text: "vuepress-theme-reco", link: "/blogs/other/guide" },
+          { text: "面试系列", link: "/blogs/other/guide" },
+          { text: "算法系列", link: "/docs/theme-reco/home" },
+          { text: "竞赛系列", link: "/series/competition/2025静态路径规划" },
         ],
       },
       { text: "关于我", link: "/blogs/other/about.html" }
@@ -59,12 +72,7 @@ export default defineUserConfig({
         },
         {
           type: "text",
-          content: `
-          <ul>
-            <li>
-            <img src="https://yuanchen.space/wechat.png" alt="wechat" title="wechat">
-            </li>     
-          </ul>`,
+          content: `<img src="https://yuanchen.space/wechat.png" alt="wechat" title="wechat">`,
           style: "font-size: 12px;",
         },
         {
@@ -78,8 +86,8 @@ export default defineUserConfig({
           type: "text",
           content: `
           <ul>
-            <li><a href="https://github.com/vuepress-reco/vuepress-theme-reco-next">博客主题官方<a/>（这个博客主题兼顾了我喜爱的blog和docs的特性）</li>
-            <li><a href="https://www.ruanyifeng.com/blog">阮一峰的网络日志<a/>(我第一次认识到的博客大佬)</li>
+            <li><a style="color: #1a42d5; font-weight: bold; text-decoration: none;" href="https://github.com/vuepress-reco/vuepress-theme-reco-next">博客主题官方</a>（这个博客主题兼顾了我喜爱的blog和docs的特性）</li>
+            <li><a style="color: #1a42d5; font-weight: bold; text-decoration: none;" href="https://www.ruanyifeng.com/blog">阮一峰的网络日志</a>(我第一次认识到的博客大佬)</li>
           </ul>`,
           style: "font-size: 12px;",
         },
