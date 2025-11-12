@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Photo Gallery with Lightbox</title>
+<!--    <link href="https://fonts.googleapis.com/css2?family=Figtree&display=swap" rel="stylesheet">-->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Figtree", sans-serif;
+        }
+
+        body {
+            display: grid;
+            place-content: center;
+            min-height: 100vh;
+            background: #000;
+            overflow-x: hidden;
+        }
+
+        .container {
+            position: relative;
+            display: grid;
+            gap: 1em;
+            width: 1600px;
+            height: 500px;
+            transition: all 400ms;
+        }
+
+        /* 默认列数根据图片数量自动调整 */
+        .container[data-count="2"] { grid-template-columns: 1fr 1fr; }
+        .container[data-count="3"] { grid-template-columns: 1fr 1fr 1fr; }
+        .container[data-count="4"] { grid-template-columns: 1fr 1fr 1fr 1fr; }
+        .container[data-count="5"] { grid-template-columns: 1fr 1fr 1fr 1fr 1fr; }
+        .container[data-count="6"] { grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; }
+        .container[data-count="7"] { grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr; }
+        .container[data-count="8"] { grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr; }
+        .container[data-count="9"] { grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr; }
+        .container[data-count="10"] { grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr; }
+        .container[data-count="11"] { grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr; }
+
+        .container:hover .box {
+            filter: grayscale(100%) opacity(24%);
+            cursor: pointer;
+        }
+
+        .box {
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            transition: all 400ms;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container .box:hover {
+            filter: grayscale(0%) opacity(100%);
+        }
+
+        /* 悬停放大逻辑：动态生成 */
+        /* 通过 JS 注入对应 :has() 规则 */
+
+        .box:nth-child(odd) {
+            transform: translateY(-16px);
+        }
+
+        .box:nth-child(even) {
+            transform: translateY(16px);
+        }
+
+        .box::after {
+            content: attr(data-text);
+            position: absolute;
+            bottom: 20px;
+            background: #000;
+            color: #fff;
+            padding: 10px 10px 10px 14px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            transform: translateY(60px);
+            opacity: 0;
+            transition: all 400ms;
+        }
+
+        .box:hover::after {
+            transform: translateY(0);
+            opacity: 1;
+            transition-delay: 400ms;
+        }
+
+        /* ========== Lightbox ========== */
+        .lightbox-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .lightbox-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            text-align: center;
+        }
+
+        .lightbox-img {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            border: 2px solid white;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 2.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .lightbox-caption {
+            color: white;
+            margin-top: 12px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="gallery"></div>
+
+<!-- Lightbox -->
+<div class="lightbox-overlay" id="lightbox">
+    <div class="lightbox-content">
+        <button class="lightbox-close" id="close-lightbox">×</button>
+        <img class="lightbox-img" id="lightbox-img" src="" alt="" />
+        <div class="lightbox-caption" id="lightbox-caption"></div>
+    </div>
+</div>
+
+<script>
+    // ✅ 照片数据（可自由修改）
+    const photos = [
+        {"name": "picture1", "photo": "./thumb/banner.jpg"},
+        {"name": "picture2", "photo": "./thumb/head.png"},
+        {"name": "picture1", "photo": "./thumb/banner.jpg"},
+        {"name": "picture2", "photo": "./thumb/head.png"},
+        {"name": "picture1", "photo": "./thumb/banner.jpg"},
+        {"name": "picture2", "photo": "./thumb/head.png"}
+    ];
+
+    const gallery = document.getElementById('gallery');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCaption = document.getElementById('lightbox-caption');
+    const closeBtn = document.getElementById('close-lightbox');
+
+    // 设置容器列数
+    gallery.setAttribute('data-count', photos.length);
+
+    // 动态生成 CSS :has() 规则（用于悬停放大）
+    const style = document.createElement('style');
+    let cssRules = '';
+    photos.forEach((_, index) => {
+        const nth = index + 1;
+        cssRules += `.container:has(.box-${nth}:hover) { grid-template-columns: `;
+        for (let i = 1; i <= photos.length; i++) {
+            cssRules += (i === nth ? '3fr' : '1fr') + (i < photos.length ? ' ' : '');
+        }
+        cssRules += '; }\n';
+    });
+    style.textContent = cssRules;
+    document.head.appendChild(style);
+
+    // 创建图片项
+    photos.forEach((item, index) => {
+        const box = document.createElement('div');
+        box.className = `box box-${index + 1}`;
+        box.style.backgroundImage = `url(${item.photo})`;
+        box.dataset.text = item.name;
+
+        // 点击弹出 Lightbox
+        box.addEventListener('click', () => {
+            lightboxImg.src = item.photo;
+            lightboxImg.alt = item.name;
+            lightboxCaption.textContent = item.name;
+            lightbox.classList.add('active');
+        });
+
+        gallery.appendChild(box);
+    });
+
+    // 关闭 Lightbox
+    closeBtn.addEventListener('click', () => {
+        lightbox.classList.remove('active');
+    });
+
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) {
+            lightbox.classList.remove('active');
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            lightbox.classList.remove('active');
+        }
+    });
+</script>
+</body>
+</html>

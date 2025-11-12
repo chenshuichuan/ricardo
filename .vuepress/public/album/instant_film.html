@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Photo Gallery with Lightbox</title>
+    <style>
+        /* cyrillic-ext */
+        @font-face {
+            font-family: 'Caveat';
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/caveat/v23/WnznHAc5bAfYB2QRah7pcpNvOx-pjfJ9eIipYSxP.woff2) format('woff2');
+            unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+        }
+        /* cyrillic */
+        @font-face {
+            font-family: 'Caveat';
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/caveat/v23/WnznHAc5bAfYB2QRah7pcpNvOx-pjfJ9eIGpYSxP.woff2) format('woff2');
+            unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+        }
+        /* latin-ext */
+        @font-face {
+            font-family: 'Caveat';
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/caveat/v23/WnznHAc5bAfYB2QRah7pcpNvOx-pjfJ9eIupYSxP.woff2) format('woff2');
+            unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+        }
+        /* latin */
+        @font-face {
+            font-family: 'Caveat';
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/caveat/v23/WnznHAc5bAfYB2QRah7pcpNvOx-pjfJ9eIWpYQ.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        body {
+            margin: 0;
+            font-family: 'Caveat', serif;
+            overflow: hidden;
+            background-image: url('./thumb/img.png');
+            background-size: cover;
+        }
+        .Container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+        }
+
+        .Picture {
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            border: 5px solid #fff;
+            border-radius: 3px;
+            background: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            transform: translate(-50%, -50%);
+            user-select: none;
+            cursor: grab;
+        }
+
+        .Picture-img {
+            display: block;
+            width: 300px;
+            height: 300px;
+            pointer-events: auto; /* 允许 img 接收点击 */
+            object-fit: cover;
+        }
+
+        .Picture-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 300px;
+            height: 70px;
+            padding: 12px 24px;
+            font-size: 1.5rem;
+            text-align: center;
+            cursor: default;
+            pointer-events: auto; /* caption 可点击但不触发 lightbox */
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .Me {
+            position: fixed;
+            z-index: 15;
+            bottom: 20px;
+            left: 50%;
+            color: #111;
+            transform: translateX(-50%);
+            font-weight: 700;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        /* Lightbox styles */
+        #lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #lightbox img {
+            max-width: 90%;
+            max-height: 80%;
+            border: 3px solid white;
+            border-radius: 5px;
+        }
+
+        #lightbox-caption {
+            color: white;
+            margin-top: 10px;
+            font-size: 1.4rem;
+            text-align: center;
+        }
+
+        #close-lightbox {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="Container" id="gallery-container"></div>
+
+<a class="Me" href="https://bit.ly/m/JordanDey" target="_top">CodePen by Jordan Dey</a>
+
+<!-- Lightbox Modal -->
+<div id="lightbox">
+    <span id="close-lightbox">&times;</span>
+    <img id="lightbox-img" src="" alt="Lightbox image">
+    <div id="lightbox-caption"></div>
+</div>
+
+<script>
+    // 相片数据
+    const photoData = [
+        {"name":"picture1","photo":"./thumb/banner.jpg"},
+        {"name":"picture2","photo":"./thumb/head.png"},
+        {"name":"picture1","photo":"./thumb/banner.jpg"},
+        {"name":"picture2","photo":"./thumb/head.png"},
+        {"name":"picture1","photo":"./thumb/banner.jpg"},
+        {"name":"picture2","photo":"./thumb/head.png"},
+        {"name":"picture1","photo":"./thumb/banner.jpg"},
+        {"name":"picture2","photo":"./thumb/head.png"}
+    ];
+
+    const container = document.getElementById('gallery-container');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCaption = document.getElementById('lightbox-caption');
+    const closeBtn = document.getElementById('close-lightbox');
+
+    let previousTouch = undefined;
+
+    function updateElementPosition(element, event) {
+        let movementX, movementY;
+
+        if (event.type === 'touchmove') {
+            const touch = event.touches[0];
+            movementX = previousTouch ? touch.clientX - previousTouch.clientX : 0;
+            movementY = previousTouch ? touch.clientY - previousTouch.clientY : 0;
+            previousTouch = touch;
+        } else {
+            movementX = event.movementX;
+            movementY = event.movementY;
+        }
+
+        const elementY = parseInt(element.style.top || 0) + movementY;
+        const elementX = parseInt(element.style.left || 0) + movementX;
+
+        element.style.top = elementY + "px";
+        element.style.left = elementX + "px";
+    }
+
+    function startDrag(pictureDiv, event) {
+        // 阻止默认行为（如图片拖拽）
+        event.preventDefault();
+
+        const updateFunction = (e) => updateElementPosition(pictureDiv, e);
+        const stopFunction = () => {
+            previousTouch = undefined;
+            document.removeEventListener("mousemove", updateFunction);
+            document.removeEventListener("touchmove", updateFunction);
+            document.removeEventListener("mouseup", stopFunction);
+            document.removeEventListener("touchend", stopFunction);
+        };
+
+        document.addEventListener("mousemove", updateFunction);
+        document.addEventListener("touchmove", updateFunction);
+        document.addEventListener("mouseup", stopFunction);
+        document.addEventListener("touchend", stopFunction);
+    }
+
+    // 创建图片卡片
+    photoData.forEach((item) => {
+        const pictureDiv = document.createElement('div');
+        pictureDiv.className = 'Picture';
+
+        const img = document.createElement('img');
+        img.className = 'Picture-img';
+        img.src = item.photo;
+        img.alt = item.name;
+
+        const noteDiv = document.createElement('div');
+        noteDiv.className = 'Picture-note';
+        noteDiv.textContent = item.name;
+
+        pictureDiv.appendChild(img);
+        pictureDiv.appendChild(noteDiv);
+
+        // 随机位置和旋转
+        const range = 100;
+        const randomX = Math.random() * (range * 2) - range;
+        const randomY = Math.random() * (range * 2) - range;
+        const randomRotate = Math.random() * (range / 2) - range / 4;
+        pictureDiv.style.top = `${randomY}px`;
+        pictureDiv.style.left = `${randomX}px`;
+        pictureDiv.style.transform = `translate(-50%, -50%) rotate(${randomRotate}deg)`;
+
+        // 拖拽：绑定到整个卡片（包括 img 和 note）
+        const dragStartHandler = (e) => startDrag(pictureDiv, e);
+        pictureDiv.addEventListener("mousedown", dragStartHandler);
+        pictureDiv.addEventListener("touchstart", dragStartHandler);
+
+        // Lightbox：仅点击 img 触发
+        img.addEventListener('click', (e) => {
+            // 阻止事件冒泡到 drag 或其他
+            e.stopPropagation();
+            lightboxImg.src = item.photo;
+            lightboxCaption.textContent = item.name;
+            lightbox.style.display = 'flex';
+        });
+
+        container.appendChild(pictureDiv);
+    });
+
+    // 关闭 lightbox
+    closeBtn.addEventListener('click', () => {
+        lightbox.style.display = 'none';
+    });
+
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) {
+            lightbox.style.display = 'none';
+        }
+    });
+</script>
+</body>
+</html>

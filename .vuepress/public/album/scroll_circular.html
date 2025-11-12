@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="--n: 0">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>3D 动物画廊 + Lightbox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Saira:wght@400;600&family=Caveat:wght@500&display=swap" rel="stylesheet">
+    <style>
+        /* ========== 原始 CSS（已转为标准 CSS） ========== */
+        @property --k {
+            syntax: '<number>';
+            initial-value: -1;
+            inherits: true;
+        }
+
+        @property --ang {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+
+        * { margin: 0; box-sizing: border-box; }
+
+        html {
+            scrollbar-width: none;
+            height: calc(var(--n) * 100%);
+        }
+
+        body, header, main, section, article, figure {
+            display: grid;
+        }
+
+        body {
+            --dir: 0;
+            grid-template-rows: max-content 1fr max-content;
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            color: #dedede;
+            font: clamp(0.625em, 3vmin, 1.5em)/1.25 Saira, sans-serif;
+            animation: k 1s linear;
+            animation-timeline: scroll();
+
+            &::before {
+                position: absolute;
+                inset: 0;
+                z-index: -1;
+                background: #000;
+                filter: url(#grain);
+                content: '';
+            }
+        }
+
+        @media (max-aspect-ratio: 2/3) {
+            body { --dir: 1; }
+        }
+
+        @keyframes k { to { --k: 1; } }
+
+        svg[height='0'][aria-hidden='true'] {
+            position: fixed;
+        }
+
+        header {
+            place-content: center;
+            place-items: center;
+            padding: 0.5em;
+            text-align: center;
+            text-wrap: balance;
+        }
+
+        em { max-width: 32em; }
+
+        main {
+            overflow: hidden;
+            perspective: 50em;
+        }
+
+        section, article {
+            transform-style: preserve-3d;
+        }
+
+        section {
+            --r: calc(2 + var(--dir)) / 3;
+            --w: clamp(4em, min(50vh, 25vw), 18em);
+            --z: calc(var(--f, 1.25) * -0.5 * var(--w) / tan(0.5turn / var(--n)));
+            place-self: center;
+            translate: 0 0 var(--z);
+            rotate: var(--dir) calc(1 - var(--dir)) 0 calc((var(--k) + 0.5) * -1turn);
+        }
+
+        article, header, figure, img, figcaption {
+            grid-area: 1 / 1;
+        }
+
+        article {
+            --j: var(--i) / var(--n);
+            --dif-lin: calc(var(--j) - mod(var(--k) + 1, 1));
+            --abs-lin: abs(var(--dif-lin));
+            --dif-mid: calc(0.5 - var(--abs-lin));
+            --abs-mid: abs(var(--dif-mid));
+            --dif-arc: calc(2 * (0.5 - var(--abs-mid)));
+            --lim: 0.35;
+            --sel: max(0, calc((var(--lim) - var(--dif-arc)) / var(--lim)));
+            --out: calc(1 - var(--sel));
+            --hov: 0;
+            width: var(--w);
+            aspect-ratio: var(--r);
+            transform:
+                    rotate3d(var(--dir), calc(1 - var(--dir)), 0, calc(var(--j) * 1turn))
+                    translateZ(var(--z))
+                    rotate(calc(var(--dir) * 0.5turn));
+            cursor: pointer; /* 可点击提示 */
+        }
+
+        article header {
+            rotate: y calc((1 + var(--hov)) * 0.5turn);
+        }
+
+        article:hover,
+        article:focus-within {
+            --hov: round(var(--sel));
+        }
+
+        @supports not (scale: abs(-1)) {
+            article {
+                --abs-lin: max(var(--dif-lin), -1 * var(--dif-lin));
+                --abs-mid: max(var(--dif-mid), -1 * var(--dif-mid));
+            }
+        }
+
+        article header,
+        figure {
+            --ang: calc(-45deg + var(--hov) * 180deg);
+            overflow: hidden;
+            position: relative;
+            border: solid 4px #0000;
+            border-radius: 0.5em;
+            backface-visibility: hidden;
+            box-shadow: 5px 5px 13px #000;
+            background:
+                    var(--url) 50% / cover padding-box,
+                    linear-gradient(#666 0 0) padding-box,
+                    repeating-conic-gradient(
+                            from var(--ang),
+                            #0000 0% 15%,
+                            color-mix(in srgb, #f48c06 calc(var(--sel) * 100%), #333) 20% 30%,
+                            #0000 35% 50%
+                    ) border-box #121212;
+            background-blend-mode: multiply, normal, normal;
+            isolation: isolate;
+            pointer-events: none;
+            transition: 0.35s ease-out;
+            transition-property: rotate, --ang;
+        }
+
+        article header::after,
+        figure::after {
+            position: absolute;
+            inset: 0;
+            opacity: var(--out);
+            background: #03071e;
+            mix-blend-mode: color;
+            pointer-events: none;
+            content: '';
+        }
+
+        h2, em, img, a, figcaption {
+            pointer-events: auto;
+        }
+
+        h2, em, figcaption {
+            opacity: round(up, var(--sel));
+            text-shadow: 1px 1px 1px #0006;
+        }
+
+        h2 {
+            font-size: 1.125em;
+        }
+
+        figure {
+            rotate: y calc(var(--hov) * 0.5turn);
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            aspect-ratio: var(--r);
+            object-fit: cover;
+            object-position: var(--pos, 50% 50%);
+        }
+
+        figcaption {
+            align-self: end;
+            padding: 0.5em;
+            background: #fff3;
+            color: #040404;
+            font: max(0.75rem, 0.75em) Caveat, cursive;
+            text-align: right;
+            backdrop-filter: blur(5px) brightness(1.5);
+        }
+
+        figcaption a {
+            color: #370617;
+        }
+
+        aside {
+            position: fixed;
+            bottom: 0;
+            padding: 0.5em;
+        }
+
+        .box-info-scrollani {
+            margin: 0.5em;
+            border-left: solid 5px #dc3055;
+            padding: 0.75em;
+            box-shadow: 2px 2px 5px hsla(0, 0%, 0%, 0.35);
+            background: #851d40;
+            color: #fff;
+            font: 1em/1.25 Ubuntu, Trebuchet MS, Arial, sans-serif;
+        }
+
+        @supports (animation-timeline: scroll()) {
+            .box-info-scrollani {
+                display: none;
+            }
+        }
+
+        kbd {
+            padding: 2px;
+            background: hsla(0, 0%, 0%, 0.35);
+            font: 1.1em/1.2 'Ubuntu Mono', Consolas, Monaco, monospace;
+        }
+
+        /* ========== Lightbox 样式 ========== */
+        .lightbox-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .lightbox-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 95vw;
+            max-height: 95vh;
+        }
+
+        .lightbox-img {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            border: 2px solid white;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 2.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .lightbox-caption {
+            color: white;
+            text-align: center;
+            margin-top: 10px;
+            font-family: Saira, sans-serif;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+<svg width="0" height="0" aria-hidden="true">
+    <filter id="grain">
+        <feTurbulence type="fractalNoise" baseFrequency="7.13" />
+        <feColorMatrix type="saturate" values="0" />
+        <feComponentTransfer>
+            <feFuncA type="linear" slope="0.02" />
+        </feComponentTransfer>
+        <feBlend in2="SourceGraphic" />
+    </filter>
+</svg>
+
+<header>
+    <h1>Infinite Scroll Circular Gallery</h1>
+</header>
+
+<main class="scene">
+    <section class="assembly" id="gallery"></section>
+</main>
+
+<!-- Lightbox Overlay -->
+<div class="lightbox-overlay" id="lightbox">
+    <div class="lightbox-content">
+        <button class="lightbox-close" id="close-lightbox">×</button>
+        <img class="lightbox-img" id="lightbox-img" src="" alt="" />
+        <div class="lightbox-caption" id="lightbox-caption"></div>
+    </div>
+</div>
+
+<aside>
+    <p class="box-info-scrollani">
+        Sorry, your browser does not appear to support scroll-driven animation. As of January 2025, this is supported in Firefox (enable
+        <kbd>layout.css.scroll-driven-animations.enabled</kbd> in <kbd>about:config</kbd>) and Chromium browsers. Safari support is coming.
+    </p>
+</aside>
+
+<script>
+    // ✅ 使用你提供的完整动物数据
+    const base = 'unsplash.com/photo';
+    const simplePhotos = [
+        {"name":"picture1","photo":"./thumb/banner.jpg"},
+        {"name":"picture2","photo":"./thumb/head.png"},
+        {"name":"picture1","photo":"./thumb/banner.jpg"},
+        {"name":"picture2","photo":"./thumb/head.png"},
+        {"name":"picture1","photo":"./thumb/banner.jpg"},
+        {"name":"picture2","photo":"./thumb/head.png"},
+        {"name":"picture1","photo":"./thumb/banner.jpg"},
+        {"name":"picture2","photo":"./thumb/head.png"}
+    ];
+
+    const data = simplePhotos.map((p, i) => ({
+        common: p.name,
+        binomial: '',
+        photo: {
+            code: p.photo, // unused
+            page: '',
+            text: p.name,
+            pos: '50% 50%',
+            by: 'Ricardo'
+        }
+    }));
+
+
+    const n = data.length;
+    document.documentElement.style.setProperty('--n', n);
+
+    const gallery = document.getElementById('gallery');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCaption = document.getElementById('lightbox-caption');
+    const closeBtn = document.getElementById('close-lightbox');
+
+    // 生成画廊项
+    data.forEach((item, i) => {
+        const imgData = item.photo;
+        const pos = imgData.pos || '50% 50%';
+        const url = `${imgData.code}`;
+
+        const article = document.createElement('article');
+        article.style.setProperty('--i', i);
+        article.style.setProperty('--url', `url(${url})`);
+        article.style.setProperty('--pos', pos);
+
+        article.innerHTML = `
+        <header>
+          <h2>${item.common}</h2>
+          <em>${item.binomial}</em>
+        </header>
+        <figure>
+          <img src="${url}" alt="${imgData.text}" />
+          <figcaption>by <a href="/}" target="_blank">${imgData.by}</a></figcaption>
+        </figure>
+      `;
+
+        // 添加点击事件：弹出 Lightbox
+        article.addEventListener('click', () => {
+            lightboxImg.src = url;
+            lightboxImg.alt = imgData.text;
+            lightboxCaption.textContent = `${item.common} — ${imgData.text}`;
+            lightbox.classList.add('active');
+        });
+
+        gallery.appendChild(article);
+    });
+
+    // 关闭 Lightbox
+    closeBtn.addEventListener('click', () => {
+        lightbox.classList.remove('active');
+    });
+
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) {
+            lightbox.classList.remove('active');
+        }
+    });
+
+    // ESC 键关闭
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            lightbox.classList.remove('active');
+        }
+    });
+
+    // ========== 原始无限滚动逻辑 ==========
+    function f(k) {
+        if (Math.abs(k) > 0.5) {
+            scrollTo(0, 0.5 * (k - Math.sign(k) + 1) * (document.documentElement.offsetHeight - window.innerHeight));
+        }
+    }
+
+    f(-1);
+    addEventListener('scroll', () => {
+        const k = parseFloat(getComputedStyle(document.body).getPropertyValue('--k'));
+        f(k);
+    });
+</script>
+</body>
+</html>

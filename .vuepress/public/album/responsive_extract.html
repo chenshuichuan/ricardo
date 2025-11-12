@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Photo Gallery</title>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #all {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: visible;
+            position: relative;
+        }
+
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 12pt;
+            background: #444 url('http://www.claudiogomboli.com/lab/gallery/imgs/background.jpg') center center / cover no-repeat;
+            color: #352e2a;
+        }
+
+        a:link, a:visited {
+            color: #333;
+            border-bottom: 1px solid #333;
+            transition: .3s;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: #000;
+            border-bottom: 1px solid #000;
+            text-decoration: none;
+        }
+
+        img {
+            width: 100%;
+            display: block;
+        }
+
+        #allcontent {
+            margin: 60px auto 0 auto;
+            width: 100%;
+            max-width: 1140px;
+            height: 700px;
+            position: relative;
+            animation: comein 1.5s ease-in-out;
+        }
+
+        .portfolio {
+            width: 100%;
+            max-width: 1000px;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .2s;
+            cursor: pointer;
+            box-shadow: -2px 0 3px rgba(0,0,0,0.3);
+        }
+
+        .portfolio:nth-child(1) { left: 10px; }
+        .portfolio:nth-child(1):hover { transform: rotate(-2deg); left: 0; }
+
+        .portfolio:nth-child(2) { left: 10%; }
+        .portfolio:nth-child(2):hover { transform: rotate(-2deg); left: 5%; }
+
+        .portfolio:nth-child(3) { left: 20%; }
+        .portfolio:nth-child(3):hover { transform: rotate(-2deg); left: 15%; }
+
+        .portfolio:nth-child(4) { left: 30%; }
+        .portfolio:nth-child(4):hover { transform: rotate(-2deg); left: 25%; }
+
+        .portfolio:nth-child(5) { left: 40%; }
+        .portfolio:nth-child(5):hover { transform: rotate(-2deg); left: 35%; }
+
+        .opened {
+            z-index: 1000;
+            left: 0 !important;
+            transform: rotate(0deg);
+            box-shadow: 0 0 3px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 1140px;
+        }
+
+        .ombra {
+            position: absolute;
+            bottom: 20px;
+            left: 10px;
+            width: 90%;
+            height: 20px;
+            box-shadow: 0 15px 10px rgba(0,0,0,0.7);
+            transform: rotate(-2deg);
+            display: none;
+            z-index: -1;
+        }
+
+        .ombra::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            right: -93px;
+            width: 90%;
+            height: 20px;
+            box-shadow: 0 15px 10px rgba(0,0,0,0.7);
+            transform: rotate(4deg);
+        }
+
+        .txt {
+            display: block;
+            margin: -2px 0 0 0;
+            padding-top: 20px;
+            width: 98%;
+            padding-left: 2%;
+            height: 33px;
+            background: #f7f7f7;
+        }
+
+        /* ===== 修改：导航固定置顶 ===== */
+        #navi {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            opacity: 0.8;
+            color: #fff;
+            height: 24px;
+            border-radius: 20px;
+            padding: 7px 10px 0 10px;
+            z-index: 2000; /* 确保在内容之上 */
+        }
+
+        .circle {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 10px;
+            background: #efefef;
+            border: 1px solid #000;
+            margin-right: 6px;
+            cursor: pointer;
+        }
+
+        .circle:hover {
+            background: #fff;
+            border: 1px solid #ccc;
+        }
+
+        .circle:active,
+        .activenav,
+        .activenav:hover {
+            background: #666;
+            border: 1px solid #333;
+        }
+
+        .activenav {
+            cursor: default;
+        }
+
+        .footer {
+            font-size: 0.6em;
+            color: #333;
+            text-align: center;
+            width: 100%;
+            height: 30px;
+            position: absolute;
+            bottom: -100px;
+            left: 0;
+        }
+
+        @keyframes comein {
+            0% { opacity: 0; transform: translateY(-3000px); }
+            80% { opacity: 1; transform: translateY(40px); }
+            100% { transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="all">
+    <div id="allcontent">
+        <div id="maincontent"></div>
+        <!-- #navi 将由 JS 创建，但占位结构保留 -->
+    </div>
+</div>
+
+<script>
+    const photosData = [
+        {"name": "picture1", "photo": "./thumb/banner.jpg"},
+        {"name": "picture2", "photo": "./thumb/head.png"}
+    ];
+
+    const mainContent = document.getElementById('maincontent');
+
+    // 创建导航容器（固定顶部）
+    const navi = document.createElement('div');
+    navi.id = 'navi';
+    document.body.appendChild(navi);
+
+    // 动态生成 portfolio 元素
+    photosData.forEach((item, index) => {
+        const portfolio = document.createElement('div');
+        portfolio.className = 'portfolio';
+        portfolio.id = `img${index + 1}`;
+
+        const img = document.createElement('img');
+        img.src = item.photo;
+        img.alt = "Portfolio img";
+
+        const txt = document.createElement('span');
+        txt.className = 'txt';
+        txt.textContent = item.name;
+
+        const ombra = document.createElement('div');
+        ombra.className = 'ombra';
+
+        portfolio.appendChild(img);
+        portfolio.appendChild(document.createElement('br'));
+        portfolio.appendChild(txt);
+        portfolio.appendChild(ombra);
+
+        mainContent.appendChild(portfolio);
+
+        // 添加导航圆点
+        const circle = document.createElement('div');
+        circle.className = 'circle';
+        circle.id = `circle${index + 1}`;
+        navi.appendChild(circle);
+    });
+
+    const portfolios = document.querySelectorAll('.portfolio');
+    const circles = document.querySelectorAll('.circle');
+
+    if (portfolios.length > 0) {
+        portfolios[0].classList.add('opened');
+        circles[0].classList.add('activenav');
+        portfolios[0].querySelector('.ombra').style.display = 'block';
+    }
+
+    portfolios.forEach((p, idx) => {
+        p.addEventListener('click', () => {
+            if (p.classList.contains('opened')) {
+                p.classList.remove('opened');
+                p.querySelector('.ombra').style.display = 'none';
+                circles[idx].classList.remove('activenav');
+                portfolios.forEach(pp => pp.style.display = '');
+            } else {
+                portfolios.forEach(pp => {
+                    pp.classList.remove('opened');
+                    pp.style.display = '';
+                    pp.querySelector('.ombra').style.display = 'none';
+                });
+                circles.forEach(c => c.classList.remove('activenav'));
+
+                p.classList.add('opened');
+                p.querySelector('.ombra').style.display = 'block';
+                circles[idx].classList.add('activenav');
+
+                portfolios.forEach((pp, i) => {
+                    if (i !== idx) pp.style.display = 'none';
+                });
+            }
+        });
+    });
+
+    circles.forEach((c, idx) => {
+        c.addEventListener('click', () => {
+            if (c.classList.contains('activenav')) return;
+
+            portfolios.forEach(pp => {
+                pp.classList.remove('opened');
+                pp.style.display = '';
+                pp.querySelector('.ombra').style.display = 'none';
+            });
+            circles.forEach(cc => cc.classList.remove('activenav'));
+
+            const target = portfolios[idx];
+            target.classList.add('opened');
+            target.querySelector('.ombra').style.display = 'block';
+            c.classList.add('activenav');
+
+            portfolios.forEach((pp, i) => {
+                if (i !== idx) pp.style.display = 'none';
+            });
+        });
+    });
+
+    // 动态设置 left 偏移（适配更多图片）
+    portfolios.forEach((p, idx) => {
+        const baseLeft = Math.min(idx * 10, 40);
+        p.style.left = `${baseLeft}%`;
+        p.addEventListener('mouseenter', () => {
+            p.style.transform = 'rotate(-2deg)';
+            p.style.left = `${Math.max(0, baseLeft - 5)}%`;
+        });
+        p.addEventListener('mouseleave', () => {
+            if (!p.classList.contains('opened')) {
+                p.style.transform = '';
+                p.style.left = `${baseLeft}%`;
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

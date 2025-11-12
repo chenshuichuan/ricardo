@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>浮动图片 + Lightbox（从上往下）</title>
+    <!-- 引入本地的 particles.min.js -->
+    <script src="particles.min.js"></script>
+    <style>
+        /* 样式保持不变 */
+        :root {
+            --duration: 20s;
+            --delay: 20s;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background-color: black;
+            //animation: shrink var(--duration) var(--delay) linear infinite;
+        }
+
+        /* 粒子容器 */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -100; /* 在最底层 */
+        }
+
+        /* 其他样式保持不变 */
+        body {
+            position: relative;
+            margin: 0 auto;
+            padding: 0 1rem;
+            width: 100vw;
+            height: 100vh;
+            animation: spin var(--duration) var(--delay) linear infinite;
+            transform-style: preserve-3d;
+            perspective: 25rem;
+            background: transparent; /* 背景交给粒子 */
+        }
+
+        img {
+            --duration: 40s;
+            position: absolute;
+            top: 0;
+            width: 33vw;
+            transform: translateY(-100vh);
+            box-shadow: 1px 3px 15px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        img:nth-child(1) { left: 0vw;   z-index: -1; animation: float-down-1 var(--duration) linear infinite; animation-delay: 0s; }
+        img:nth-child(2) { left: 10vw;  z-index: -3; animation: float-down-3 calc(var(--duration)*1.5) linear infinite; animation-delay: -3s; }
+        img:nth-child(3) { left: 90vw;  z-index: -2; animation: float-down-2 calc(var(--duration)*1.25) linear infinite; animation-delay: -6s; }
+        img:nth-child(4) { left: 36vw;  z-index: -1; animation: float-down-1 var(--duration) linear infinite; animation-delay: -9s; }
+        img:nth-child(5) { left: 62vw;  z-index: -3; animation: float-down-3 calc(var(--duration)*1.5) linear infinite; animation-delay: -12s; }
+        img:nth-child(6) { left: 15vw;  z-index: -2; animation: float-down-2 calc(var(--duration)*1.25) linear infinite; animation-delay: -15s; }
+        img:nth-child(7) { left: 55vw;  z-index: -2; animation: float-down-2 calc(var(--duration)*1.25) linear infinite; animation-delay: -18s; }
+        img:nth-child(8) { left: -20vw; z-index: -3; animation: float-down-3 calc(var(--duration)*1.5) linear infinite; animation-delay: -21s; }
+        img:nth-child(9) { left: 68vw;  z-index: -1; animation: float-down-1 var(--duration) linear infinite; animation-delay: -24s; }
+        img:nth-child(10){ left: 0vw;   z-index: -2; animation: float-down-2 calc(var(--duration)*1.25) linear infinite; animation-delay: -27s; }
+
+        @keyframes float-down-3 {
+            from { transform: translateY(-200vh) translateZ(-50vh); }
+            to   { transform: translateY(200vh) translateZ(-50vh); }
+        }
+
+        @keyframes float-down-2 {
+            from { transform: translateY(-150vh) translateZ(-25vh); }
+            to   { transform: translateY(150vh) translateZ(-25vh); }
+        }
+
+        @keyframes float-down-1 {
+            from { transform: translateY(-100vh); }
+            to   { transform: translateY(100vh); }
+        }
+
+        @keyframes spin {
+            10%, 100% { transform: rotateY(360deg); }
+        }
+
+        @keyframes shrink {
+            0%        { transform: scale(1) translateX(0); }
+            2.5%      { transform: scale(0.75) translateX(5%); }
+            7.5%      { transform: scale(0.75) translateX(-5%); }
+            10%, 100% { transform: scale(1); }
+        }
+
+        /* Lightbox 容器 */
+        #lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        /* ✅ 关键修复：重置 lightbox 图片样式 */
+        #lightbox-img {
+            position: static !important;
+            transform: none !important;
+            width: auto !important;
+            height: auto !important;
+            max-width: 90vw;
+            max-height: 80vh;
+            object-fit: contain;
+            border: 2px solid white;
+            box-shadow: 0 0 30px rgba(255,255,255,0.3);
+            display: block;
+            margin: 0 auto;
+        }
+
+        #lightbox-caption {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            font-family: Arial, sans-serif;
+            max-width: 90vw;
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+
+<div id="lightbox" onclick="this.style.display='none'">
+    <img id="lightbox-img" src="" alt="放大图">
+    <div id="lightbox-caption"></div>
+</div>
+<!-- 粒子背景容器 -->
+<div id="particles-js"></div>
+
+<script>
+    const photos = [
+        {"name":"picture1","photo":"./thumb/banner.jpg"},
+        {"name":"picture2","photo":"./thumb/head.png"},
+        {"name":"picture1","photo":"./thumb/banner.jpg"},
+        {"name":"picture2","photo":"./thumb/head.png"},
+        {"name":"picture1","photo":"./thumb/banner.jpg"},
+        {"name":"picture2","photo":"./thumb/head.png"}
+    ];
+
+    photos.forEach(item => {
+        const img = document.createElement('img');
+        img.src = item.photo;
+        img.alt = item.name;
+        img.loading = "lazy";
+
+        img.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('lightbox-img').src = item.photo;
+            document.getElementById('lightbox-caption').textContent = item.name;
+            document.getElementById('lightbox').style.display = 'flex';
+        });
+
+        document.body.appendChild(img);
+    });
+
+    // 初始化粒子效果
+    // 初始化粒子背景
+    function initParticles() {
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#ff6b6b" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#ffa500",
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" },
+                    resize: true
+                },
+                modes: {
+                    repulse: { distance: 100 },
+                    push: { particles_nb: 4 }
+                }
+            },
+            retina_detect: true
+        });
+    }
+
+    // 初始化粒子背景
+    // initParticles();
+    // 当DOM加载完成后初始化
+    document.addEventListener('DOMContentLoaded', initParticles);
+</script>
+
+</body>
+</html>

@@ -54,7 +54,8 @@ export default defineUserConfig({
           { text: "竞赛系列", link: "/series/competition/2025静态路径规划" },
         ],
       },
-      { text: "关于我", link: "/blogs/other/about.html" }
+      { text: "相册", link: "/blogs/other/album" },
+      { text: "关于我", link: "/blogs/other/about" }
     ],
     bulletin: {
       body: [

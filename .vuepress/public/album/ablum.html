@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>炫酷多相册展示</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* 粒子背景 */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        /* 主容器 */
+        .container {
+            display: flex;
+            min-height: 100vh;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* 年份轴 */
+        .timeline {
+            width: 100px;
+            position: fixed;
+            height: 100vh;
+            padding: 40px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(10, 15, 30, 0.7);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 10;
+        }
+
+        .year-item {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 15px 0;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            font-size: 18px;
+            position: relative;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .year-item:hover {
+            transform: scale(1.1);
+            color: #fff;
+        }
+
+        .year-item.active {
+            background: linear-gradient(135deg, #ff6b6b, #ffa500);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+        }
+
+        .year-item::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            top: 0;
+            right: -20px;
+        }
+
+        /* 相册内容区 */
+        .gallery-container {
+            flex: 1;
+            margin-left: 120px;
+            padding-top: 40px;
+        }
+
+        .year-header {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #ff6b6b, #ffa500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(255, 107, 107, 0.3);
+        }
+
+        .albums-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            padding: 20px;
+        }
+
+        .album-card {
+            background: rgba(25, 35, 60, 0.6);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            height: 320px;
+        }
+
+        .album-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4);
+        }
+
+        .album-thumb {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .album-card:hover .album-thumb {
+            transform: scale(1.1);
+        }
+
+        .album-info {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .album-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 10px;
+            color: #fff;
+        }
+
+        .album-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(10, 15, 30, 0.9), transparent);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .album-card:hover .album-overlay {
+            opacity: 1;
+        }
+
+        .view-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ffa500);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 auto 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .view-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        /* 加载动画 */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f0f1b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid #ff6b6b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .timeline {
+                width: 70px;
+                padding: 30px 0;
+            }
+
+            .year-item {
+                width: 50px;
+                height: 50px;
+                font-size: 16px;
+            }
+
+            .gallery-container {
+                margin-left: 90px;
+                padding-top: 30px;
+            }
+
+            .year-header {
+                font-size: 2rem;
+            }
+
+            .albums-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .timeline {
+                width: 60px;
+                padding: 20px 0;
+            }
+
+            .year-item {
+                width: 40px;
+                height: 40px;
+                font-size: 14px;
+                margin: 10px 0;
+            }
+
+            .gallery-container {
+                margin-left: 80px;
+                padding-top: 20px;
+            }
+
+            .year-header {
+                font-size: 1.8rem;
+            }
+
+            .albums-grid {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- 粒子背景容器 -->
+<div id="particles-js"></div>
+
+<!-- 加载动画 -->
+<div class="loading" id="loading">
+    <div class="spinner"></div>
+</div>
+
+<!-- 主容器 -->
+<div class="container">
+    <!-- 年份轴 -->
+    <div class="timeline" id="timeline"></div>
+
+    <!-- 相册内容区 -->
+    <div class="gallery-container">
+        <h1 class="year-header" id="current-year">2025</h1>
+        <div class="albums-grid" id="albums-grid"></div>
+    </div>
+</div>
+
+<!-- 引入粒子库 -->
+<script src="/album/particles.min.js"></script>
+
+<script>
+    // 相册数据
+    const albumData = [
+        {"year":"2025","name":"学生","thumb":"/album/thumb/head.png","url":"/album/student.html"},
+        {"year":"2025","name":"毕业典礼","thumb":"/album/thumb/head.png","url":"/album/graduation.html"},
+        {"year":"2025","name":"校园活动","thumb":"/album/thumb/head.png","url":"/album/campus.html"},
+        {"year":"2024","name":"新生入学","thumb":"/album/thumb/head.png","url":"/album/freshman.html"},
+        {"year":"2024","name":"运动会","thumb":"/album/thumb/head.png","url":"/album/sports.html"},
+        {"year":"2024","name":"艺术节","thumb":"/album/thumb/head.png","url":"/album/art.html"},
+        {"year":"2023","name":"春游","thumb":"/album/thumb/head.png","url":"/album/spring.html"},
+        {"year":"2023","name":"科技竞赛","thumb":"/album/thumb/head.png","url":"/album/tech.html"},
+        {"year":"2023","name":"志愿者活动","thumb":"/album/thumb/head.png","url":"/album/volunteer.html"},
+        {"year":"2022","name":"军训","thumb":"/album/thumb/head.png","url":"/album/military.html"},
+        {"year":"2022","name":"实验室","thumb":"/album/thumb/head.png","url":"/album/lab.html"},
+        {"year":"2022","name":"图书馆","thumb":"/album/thumb/head.png","url":"/album/library.html"}
+    ];
+
+    // 获取唯一年份并排序
+    const years = [...new Set(albumData.map(item => item.year))].sort((a, b) => b - a);
+    let currentYear = years[0] || "2025";
+
+    // 初始化粒子背景
+    function initParticles() {
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#ff6b6b" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#ffa500",
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" },
+                    resize: true
+                },
+                modes: {
+                    repulse: { distance: 100 },
+                    push: { particles_nb: 4 }
+                }
+            },
+            retina_detect: true
+        });
+    }
+
+    // 渲染年份轴
+    function renderTimeline() {
+        const timeline = document.getElementById('timeline');
+        timeline.innerHTML = '';
+
+        years.forEach(year => {
+            const yearItem = document.createElement('div');
+            yearItem.className = 'year-item';
+            yearItem.textContent = year;
+            yearItem.dataset.year = year;
+
+            if (year === currentYear) {
+                yearItem.classList.add('active');
+            }
+
+            yearItem.addEventListener('click', () => {
+                currentYear = year;
+                updateActiveYear();
+                renderAlbums();
+            });
+
+            timeline.appendChild(yearItem);
+        });
+    }
+
+    // 更新当前年份显示
+    function updateActiveYear() {
+        document.querySelectorAll('.year-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.dataset.year === currentYear) {
+                item.classList.add('active');
+            }
+        });
+        document.getElementById('current-year').textContent = currentYear;
+    }
+
+    // 渲染相册
+    function renderAlbums() {
+        const albumsGrid = document.getElementById('albums-grid');
+        albumsGrid.innerHTML = '';
+
+        const currentAlbums = albumData.filter(album => album.year === currentYear);
+
+        if (currentAlbums.length === 0) {
+            albumsGrid.innerHTML = '<p style="text-align: center; font-size: 1.2rem; color: rgba(255,255,255,0.7);">该年份暂无相册</p>';
+            return;
+        }
+
+        currentAlbums.forEach(album => {
+            const albumCard = document.createElement('div');
+            albumCard.className = 'album-card';
+
+            // 创建缩略图
+            const thumb = document.createElement('img');
+            thumb.className = 'album-thumb';
+            thumb.src = album.thumb;
+            thumb.alt = album.name;
+            thumb.onerror = () => {
+                thumb.src = 'https://via.placeholder.com/300x220/1a1a2e/ff6b6b?text=No+Image';
+            };
+
+            // 创建信息区域
+            const info = document.createElement('div');
+            info.className = 'album-info';
+
+            const name = document.createElement('div');
+            name.className = 'album-name';
+            name.textContent = album.name;
+
+            info.appendChild(name);
+
+            // 创建覆盖层
+            const overlay = document.createElement('div');
+            overlay.className = 'album-overlay';
+
+            const viewBtn = document.createElement('button');
+            viewBtn.className = 'view-btn';
+            viewBtn.innerHTML = '<i class="fas fa-eye"></i> 查看详情';
+            viewBtn.onclick = () => {
+                window.location.href = album.url;
+            };
+
+            overlay.appendChild(viewBtn);
+
+            albumCard.appendChild(thumb);
+            albumCard.appendChild(info);
+            albumCard.appendChild(overlay);
+
+            // 添加点击跳转事件
+            albumCard.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('view-btn')) {
+                    window.location.href = album.url;
+                }
+            });
+
+            albumsGrid.appendChild(albumCard);
+        });
+    }
+
+    // 页面滚动切换年份
+    function handleScroll() {
+        const scrollY = window.scrollY;
+        const windowHeight = window.innerHeight;
+
+        // 计算当前应该显示的年份索引
+        const yearIndex = Math.floor(scrollY / windowHeight);
+
+        if (yearIndex >= 0 && yearIndex < years.length) {
+            const newYear = years[yearIndex];
+            if (newYear !== currentYear) {
+                currentYear = newYear;
+                updateActiveYear();
+                renderAlbums();
+            }
+        }
+    }
+
+    // 初始化页面
+    function init() {
+        // 设置页面高度以支持滚动
+        document.body.style.height = `${years.length * 100}vh`;
+
+        // 初始化粒子背景
+        initParticles();
+
+        // 渲染年份轴
+        renderTimeline();
+
+        // 渲染初始相册
+        renderAlbums();
+
+        // 绑定滚动事件
+        window.addEventListener('scroll', handleScroll);
+
+        // 隐藏加载动画
+        setTimeout(() => {
+            document.getElementById('loading').style.opacity = '0';
+            document.getElementById('loading').style.visibility = 'hidden';
+        }, 800);
+    }
+
+    // 当DOM加载完成后初始化
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

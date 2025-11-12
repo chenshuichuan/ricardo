@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Photo Gallery with Lightbox</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .gallery {
+            position: relative;
+        }
+
+        .gallery-track {
+            position: fixed;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.25rem;
+            padding: 0.25rem;
+            will-change: transform;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+
+        .card {
+            height: 400px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .card-image-wrapper {
+            height: 135%;
+            will-change: transform;
+        }
+
+        .card-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* 响应式 */
+        @media (max-width: 799px) {
+            .gallery-track {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 549px) {
+            .gallery-track {
+                grid-template-columns: repeat(1, 1fr);
+            }
+        }
+
+        /* ========== Lightbox ========== */
+        .lightbox-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .lightbox-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .lightbox-img {
+            max-width: 90vw;
+            max-height: 85vh;
+            object-fit: contain;
+            border: 2px solid white;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 2.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            z-index: 1001;
+        }
+    </style>
+</head>
+<body>
+
+<main class="gallery">
+    <div class="gallery-track" id="gallery-track"></div>
+</main>
+
+<!-- Lightbox -->
+<div class="lightbox-overlay" id="lightbox">
+    <button class="lightbox-close" id="close-lightbox">×</button>
+    <img class="lightbox-img" id="lightbox-img" src="" alt="" />
+</div>
+
+<script>
+    // ✅ 你的照片数据
+    const photos = [
+        {"name": "picture1", "photo": "./thumb/banner.jpg"},
+        {"name": "picture2", "photo": "./thumb/head.png"},
+        {"name": "picture1", "photo": "./thumb/banner.jpg"},
+        {"name": "picture2", "photo": "./thumb/head.png"},
+        {"name": "picture1", "photo": "./thumb/banner.jpg"},
+        {"name": "picture2", "photo": "./thumb/head.png"},
+        {"name": "picture1", "photo": "./thumb/banner.jpg"},
+        {"name": "picture2", "photo": "./thumb/head.png"},
+        {"name": "picture1", "photo": "./thumb/banner.jpg"},
+        {"name": "picture2", "photo": "./thumb/head.png"}
+    ];
+
+    const galleryTrack = document.getElementById('gallery-track');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const closeBtn = document.getElementById('close-lightbox');
+
+    // 动态生成卡片
+    photos.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'card-image-wrapper';
+
+        const img = document.createElement('img');
+        img.src = item.photo;
+        img.alt = item.name;
+
+        // 点击弹出 Lightbox
+        card.addEventListener('click', () => {
+            lightboxImg.src = item.photo;
+            lightboxImg.alt = item.name;
+            lightbox.classList.add('active');
+        });
+
+        wrapper.appendChild(img);
+        card.appendChild(wrapper);
+        galleryTrack.appendChild(card);
+    });
+
+    // 设置 body 高度（确保可滚动）
+    function updateGalleryHeight() {
+        const trackHeight = galleryTrack.clientHeight;
+        document.querySelector('.gallery').style.height = `${trackHeight}px`;
+    }
+
+    // 视差 & 滚动逻辑
+    const cards = document.querySelectorAll('.card');
+    const easing = 0.05;
+    let startY = 0;
+    let endY = 0;
+    let raf;
+
+    const lerp = (start, end, t) => start * (1 - t) + end * t;
+
+    function updateScroll() {
+        startY = lerp(startY, endY, easing);
+        galleryTrack.style.transform = `translateY(-${startY}px)`;
+        activateParallax();
+        raf = requestAnimationFrame(updateScroll);
+        if (Math.abs(startY - window.scrollY) < 0.5) {
+            cancelAnimationFrame(raf);
+        }
+    }
+
+    function startScroll() {
+        endY = window.scrollY;
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(updateScroll);
+    }
+
+    function parallax(card) {
+        const wrapper = card.querySelector('.card-image-wrapper');
+        const diff = card.offsetHeight - wrapper.offsetHeight;
+        const { top } = card.getBoundingClientRect();
+        const progress = top / window.innerHeight;
+        const yPos = diff * progress;
+        wrapper.style.transform = `translateY(${yPos}px)`;
+    }
+
+    const activateParallax = () => cards.forEach(parallax);
+
+    // 初始化
+    window.addEventListener('load', () => {
+        updateGalleryHeight();
+        activateParallax();
+        startScroll();
+    });
+
+    window.addEventListener('scroll', () => {
+        endY = window.scrollY;
+        startScroll();
+    });
+
+    window.addEventListener('resize', () => {
+        updateGalleryHeight();
+        activateParallax();
+    });
+
+    // Lightbox 关闭
+    closeBtn.addEventListener('click', () => {
+        lightbox.classList.remove('active');
+    });
+
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) {
+            lightbox.classList.remove('active');
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            lightbox.classList.remove('active');
+        }
+    });
+</script>
+</body>
+</html>

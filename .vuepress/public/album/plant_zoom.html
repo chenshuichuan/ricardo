@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>相册展示</title>
+  <style>
+    body {
+      padding: 30px 0;
+      position: relative;
+      background: #f5f5f5;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .gallery {
+      width: 1200px;
+      max-width: 95%;
+      margin: auto;
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+      height: auto;
+    }
+
+    .img-c {
+      width: 200px;
+      height: 200px;
+      float: left;
+      position: relative;
+      overflow: hidden;
+      margin: 5px;
+      box-sizing: border-box;
+    }
+
+    .img-w {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      cursor: pointer;
+      transition: transform ease-in-out 300ms;
+    }
+
+    .img-w img {
+      display: none; /* 我们用 background-image，所以 img 标签实际不用 */
+    }
+
+    .img-c:hover .img-w {
+      transform: scale(1.08);
+      transition: transform cubic-bezier(0.4, 0, 0.2, 1) 450ms;
+    }
+
+    .img-c.active {
+      width: 100% !important;
+      height: 100vh !important;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      margin: 0;
+      border-radius: 0;
+    }
+
+    .img-c.active .img-w {
+      transform: scale(1);
+    }
+
+    .img-c.postactive {
+      position: absolute;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .img-c.active.positioned {
+      left: 0 !important;
+      top: 0 !important;
+      transition-delay: 50ms;
+    }
+
+    /* 关闭按钮 */
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: white;
+      font-size: 30px;
+      cursor: pointer;
+      z-index: 1001;
+      background: rgba(0,0,0,0.5);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.8;
+      transition: opacity 0.3s;
+    }
+
+    .close-btn:hover {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+<div class="gallery" id="gallery"></div>
+
+<script>
+  // 相片数据（可替换为你的实际数据）
+  const photos = [
+    {"name":"picture1","photo":"./thumb/head.png"},
+    {"name":"picture2","photo":"./thumb/head.png"},
+    {"name":"sample3","photo":"./thumb/head.png"},
+      {"name":"picture1","photo":"./thumb/head.png"},
+      {"name":"picture2","photo":"./thumb/head.png"},
+      {"name":"sample3","photo":"./thumb/head.png"},
+      {"name":"picture1","photo":"./thumb/head.png"},
+      {"name":"picture2","photo":"./thumb/head.png"},
+      {"name":"sample3","photo":"./thumb/head.png"},
+    {"name":"sample4","photo":"https://images.unsplash.com/photo-1485793997698-baba81bf21ab?dpr=1&auto=format&fit=crop&w=1500&h=1000&q=80&cs=tinysrgb"},
+    {"name":"sample5","photo":"https://images.unsplash.com/photo-1485871800663-71856dc09ec4?dpr=1&auto=format&fit=crop&w=1500&h=2250&q=80&cs=tinysrgb"}
+  ];
+
+  const gallery = document.getElementById('gallery');
+  let activeIndex = -1;
+
+  // 渲染所有缩略图容器
+  photos.forEach((photo, index) => {
+    const container = document.createElement('div');
+    container.className = 'img-c';
+    container.dataset.index = index;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'img-w';
+    wrapper.style.backgroundImage = `url(${photo.photo})`;
+    wrapper.title = photo.name;
+
+    container.appendChild(wrapper);
+    gallery.appendChild(container);
+
+    // 点击事件：放大
+    container.addEventListener('click', () => {
+      if (activeIndex === index) {
+        // 当前已是放大状态，关闭
+        closeActive();
+      } else {
+        openPhoto(index);
+      }
+    });
+  });
+
+  function openPhoto(index) {
+    closeActive(); // 先关闭已打开的
+
+    const containers = document.querySelectorAll('.img-c');
+    const target = containers[index];
+
+    // 添加激活类
+    target.classList.add('active');
+    activeIndex = index;
+
+    // 创建关闭按钮
+    const closeBtn = document.createElement('div');
+    closeBtn.className = 'close-btn';
+    closeBtn.innerHTML = '&times;';
+    closeBtn.addEventListener('click', closeActive);
+    document.body.appendChild(closeBtn);
+  }
+
+  function closeActive() {
+    if (activeIndex === -1) return;
+
+    const containers = document.querySelectorAll('.img-c');
+    containers[activeIndex].classList.remove('active');
+    activeIndex = -1;
+
+    // 移除关闭按钮
+    const btn = document.querySelector('.close-btn');
+    if (btn) btn.remove();
+  }
+
+  // 点击 ESC 键关闭
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeActive();
+  });
+
+  // 点击画廊外区域关闭（仅在激活时）
+  document.addEventListener('click', (e) => {
+    if (activeIndex !== -1 && !e.target.closest('.img-c') && !e.target.classList.contains('close-btn')) {
+      closeActive();
+    }
+  });
+</script>
+
+</body>
+</html>
