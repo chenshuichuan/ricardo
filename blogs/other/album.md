@@ -6,6 +6,33 @@ date: 2025/11/11
 ## 导航
 <a style="color: #1a42d5; font-weight: bold; text-decoration: none;" href="/album/ablum.html">相册总览</a>
 
+## 最青春的我们
+<div style="text-align: center; margin: 20px 0;">
+  <img src="http://files.yuanchen.space/blogs/somebody/somebody20.jpg" alt="图1" style="max-width: 400px; cursor: pointer;" onclick="this.style.maxWidth = this.style.maxWidth === '100%' ? '600px' : '100%';" />
+    <a href="/album/2013somebody.html" target="_blank"
+    rel="noopener noreferrer" style="display: block; margin-top: 8px; text-decoration: none; color: #007bff;">
+    最青春的我们
+  </a>
+</div>
+
+## 杭州之旅
+<div style="text-align: center; margin: 20px 0;">
+  <img src="http://files.yuanchen.space/blogs/hangzhou/hangzhou39.jpg" alt="图1" style="max-width: 400px; cursor: pointer;" onclick="this.style.maxWidth = this.style.maxWidth === '100%' ? '600px' : '100%';" />
+    <a href="/album/2018hangzhou.html" target="_blank"
+    rel="noopener noreferrer" style="display: block; margin-top: 8px; text-decoration: none; color: #007bff;">
+    杭州之旅
+  </a>
+</div>
+
+## 徐徐徐
+<div style="text-align: center; margin: 20px 0;">
+  <img src="http://files.yuanchen.space/blogs/xuxuxu/xuxuxu12.jpg" alt="图1" style="max-width: 400px; cursor: pointer;" onclick="this.style.maxWidth = this.style.maxWidth === '100%' ? '600px' : '100%';" />
+    <a href="/album/2025xuxuxu.html" target="_blank"
+    rel="noopener noreferrer" style="display: block; margin-top: 8px; text-decoration: none; color: #007bff;">
+    徐徐徐
+  </a>
+</div>
+
 ## 2025
 
 ### 你好

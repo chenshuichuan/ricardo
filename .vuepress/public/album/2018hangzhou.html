@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>杭州之旅</title>
+    <style>
+        /* 基础布局 */
+        ul {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        li {
+            height: 40vh;
+            flex-grow: 1;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        li .caption {
+            display: none;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            text-align: center;
+            padding: 5px 0;
+            font-size: 16px;
+        }
+
+        li:hover .caption {
+            display: block;
+        }
+
+        li:last-child {
+            flex-grow: 10;
+        }
+
+        img {
+            max-height: 100%;
+            min-width: 100%;
+            object-fit: cover;
+            vertical-align: bottom;
+            display: block;
+        }
+
+        /* Lightbox 样式 */
+        #lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #lightbox img {
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+            border: 2px solid white;
+        }
+
+        #close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<ul id="gallery"></ul>
+
+<div id="lightbox">
+    <span id="close">&times;</span>
+    <img id="lightbox-img" src="" alt="放大图片">
+</div>
+
+<script>
+    // 图片数据
+    const photos = [
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou1.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou2.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou3.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou4.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou5.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou6.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou7.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou8.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou9.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou10.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou11.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou12.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou13.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou14.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou15.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou16.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou17.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou18.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou19.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou20.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou21.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou22.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou23.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou24.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou25.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou26.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou27.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou28.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou29.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou30.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou31.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou32.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou33.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou34.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou35.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou36.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou37.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou38.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou39.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou40.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou41.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou42.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou43.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou44.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou45.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou46.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou47.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou48.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou49.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou50.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou51.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou52.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou53.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou54.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou55.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou56.jpg"},
+        {"name":"hangzhou","photo":"http://files.yuanchen.space/blogs/hangzhou/hangzhou57.jpg"},
+    ];
+
+    // 获取容器
+    const gallery = document.getElementById('gallery');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const closeBtn = document.getElementById('close');
+
+    // 动态生成图片项
+    photos.forEach(item => {
+        const li = document.createElement('li');
+        const img = document.createElement('img');
+        img.src = item.photo;
+        img.alt = item.name;
+        img.loading = 'lazy';
+        li.appendChild(img);
+
+        // 添加图片名称
+        const captionDiv = document.createElement('div');
+        captionDiv.className = 'caption';
+        captionDiv.textContent = item.name;
+        li.appendChild(captionDiv);
+
+        gallery.appendChild(li);
+
+        // 点击事件：打开 Lightbox
+        li.addEventListener('click', () => {
+            lightboxImg.src = item.photo;
+            lightbox.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // 防止背景滚动
+        });
+    });
+
+    // 关闭 Lightbox
+    closeBtn.addEventListener('click', () => {
+        lightbox.style.display = 'none';
+        document.body.style.overflow = ''; // 恢复滚动
+    });
+
+    // 点击遮罩关闭
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) {
+            lightbox.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    });
+
+    // ESC 键关闭
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && lightbox.style.display === 'flex') {
+            lightbox.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    });
+</script>
+
+</body>
+</html>
