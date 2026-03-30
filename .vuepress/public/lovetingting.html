@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>只为你 ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Great+Vibes&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a0a1e 0%, #2d1b3d 50%, #1a0a1e 100%);
+            font-family: 'Playfair Display', serif;
+            overflow-x: hidden;
+            color: #fff;
+        }
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        .star {
+            position: absolute; width: 3px; height: 3px; background: #fff; border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        .heart {
+            position: absolute; font-size: 24px; animation: fall linear infinite; opacity: 0; z-index: 1; top: -50px;
+        }
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        .container {
+            position: relative; z-index: 10; min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; padding: 20px; text-align: center;
+        }
+        .photo-frame {
+            width: 200px; height: 200px; border-radius: 50%; border: 4px solid rgba(255, 182, 193, 0.6);
+            box-shadow: 0 0 30px rgba(255, 182, 193, 0.4), inset 0 0 30px rgba(255, 182, 193, 0.2);
+            overflow: hidden; margin-bottom: 30px; animation: pulse 3s ease-in-out infinite;
+            display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #ffb6c1, #ff69b4);
+        }
+        .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-frame .placeholder { font-size: 80px; }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(255, 182, 193, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(255, 182, 193, 0.6); }
+        }
+
+        h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.5rem;
+            color: #ffb6c1;
+            text-shadow: 0 0 20px rgba(255, 182, 193, 0.5);
+            margin-bottom: 10px;
+            animation: fadeInUp 1s ease-out;
+        }
+        .name {
+            font-size: 2rem;
+            color: #ffc0cb;
+            margin-bottom: 20px;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+        .message {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            max-width: 600px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        /* 修改点1：增大时间容器的间距 */
+        .timer {
+            display: flex;
+            gap: 40px; /* 增加了间距，让大数字不拥挤 */
+            margin: 20px 0;
+            animation: fadeInUp 1s ease-out 0.5s both;
+            justify-content: center;
+        }
+        .timer-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 80px; /* 增加最小宽度 */
+        }
+        /* 修改点2：核心修改 - 增大时间数字的显示大小 */
+        .timer-value {
+            font-size: 4rem; /* 原本是 2rem，现在翻倍了 */
+            font-weight: 600;
+            color: #ffb6c1;
+            font-family: 'Great Vibes', cursive;
+            line-height: 1;
+        }
+        .timer-label {
+            font-size: 1rem; /* 稍微调大标签 */
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .date-item { text-align: center; }
+        .date-label { font-size: 0.9rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 5px; }
+        .date-value { font-size: 1.5rem; color: #ffb6c1; font-weight: 600; }
+
+        .love-quotes { margin-top: 40px; animation: fadeInUp 1s ease-out 0.8s both; }
+        .quote {
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.8rem;
+            color: #ffc0cb;
+            margin: 20px 0;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+        }
+        .quote:nth-child(1) { animation-delay: 1s; }
+        .quote:nth-child(2) { animation-delay: 1.5s; }
+        .quote:nth-child(3) { animation-delay: 2s; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .music-btn {
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%;
+            background: linear-gradient(135deg, #ff69b4, #ffb6c1); border: none; cursor: pointer;
+            font-size: 24px; box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4); transition: transform 0.3s, box-shadow 0.3s; z-index: 100;
+        }
+        .music-btn:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(255, 105, 180, 0.6); }
+        .music-btn.playing { animation: bounce 1s infinite; }
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .footer {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.5); font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2.5rem; }
+            .name { font-size: 1.5rem; }
+            .photo-frame { width: 150px; height: 150px; }
+
+            /* 响应式调整：在小屏幕上数字缩小一点，间距变小 */
+            .timer { gap: 15px; }
+            .timer-value { font-size: 2.5rem; }
+            .timer-item { min-width: auto; }
+
+            .message { font-size: 1rem; padding: 0 20px; }
+        }
+        /* 修改点1：新增彩虹渐变动画 */
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 修改点2：定义彩色名字的样式 */
+        .rainbow-text {
+            background: linear-gradient(90deg, #ff69b4, #ff4500, #ffd700, #32cd32, #1e90ff, #9932cc, #ff69b4);
+            background-size: 400% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            font-size: 2.8rem; /* 名字字号稍大 */
+            font-family: 'Great Vibes', cursive;
+            animation: rainbow 8s linear infinite;
+            display: inline-block;
+        }
+
+        /* 修改点3：丘比特连接样式 (爱心箭头) */
+        .cupid-arrow {
+            font-size: 2.5rem;
+            margin: 0 15px;
+            animation: pulseHeart 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulseHeart {
+            0%, 100% { transform: scale(1); color: #fff; }
+            50% { transform: scale(1.2); color: #ff69b4; }
+        }
+
+        /* ... (中间的 CSS 代码保持不变) ... */
+
+        /* 修改点4：增大时间显示 (原回答已包含，此处再次确认) */
+        .timer-value {
+            font-size: 4rem;
+            font-weight: 600;
+            color: #ffb6c1;
+            font-family: 'Great Vibes', cursive;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<div class="container">
+    <div class="photo-frame">
+        <span class="placeholder">💕</span>
+    </div>
+    <!-- 修改点5：HTML结构替换 -->
+    <!-- 删除了原来的 h1 和 .name -->
+    <!-- 新增：合并的名字展示 -->
+    <div class="names-combined" style="display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;">
+        <span class="rainbow-text">[婷 婷 宝 宝]</span>
+        <span class="cupid-arrow">💘</span>
+        <span class="rainbow-text">[渊 渊 宝 宝]</span>
+    </div>
+
+    <p class="message">
+        与你共度的每一刻，都是无价的珍宝。<br>
+        你的笑容点亮了我的世界，你的声音是我最爱的旋律，<br>
+        而你的爱，是我收到过最珍贵的礼物。<br>
+        我承诺，我会珍惜你、呵护你，<br>
+        并且每一天，都比昨天更爱你。 ❤️
+    </p>
+    <div class="timer">
+        <div class="timer-item">
+            <span class="timer-value" id="days">0</span>
+            <span class="timer-label">天数</span>
+        </div>
+        <div class="timer-item">
+            <span class="timer-value" id="hours">00</span>
+            <span class="timer-label">小时</span>
+        </div>
+        <div class="timer-item">
+            <span class="timer-value" id="minutes">00</span>
+            <span class="timer-label">分钟</span>
+        </div>
+        <div class="timer-item">
+            <span class="timer-value" id="seconds">00</span>
+            <span class="timer-label">秒数</span>
+        </div>
+    </div>
+
+    <div class="love-quotes">
+        <p class="quote">"遇见你，是我今生最美的意外。"</p>
+        <p class="quote">"你是我今生的唯一，也是我所有的未来。"</p>
+        <p class="quote">"我的心只为你而跳动。"</p>
+    </div>
+</div>
+<button class="music-btn" id="musicBtn" title="播放音乐">🎵</button>
+<div class="footer">只为你而作 💕</div>
+<script>
+    // 创建星星
+    const starsContainer = document.getElementById('stars');
+    for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 2 + 's';
+        star.style.animationDuration = (Math.random() * 2 + 1) + 's';
+        starsContainer.appendChild(star);
+    }
+
+    // 创建飘落爱心
+    function createHeart() {
+        const heart = document.createElement('div');
+        heart.className = 'heart';
+        heart.innerHTML = ['💕', '💖', '💗', '❤️', '💘'][Math.floor(Math.random() * 0)];
+        heart.style.left = Math.random() * 100 + '%';
+        heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+        heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 7000);
+    }
+    setInterval(createHeart, 500);
+
+    // 修改点3：计时器逻辑 - 修改了起始日期（请根据实际情况修改下面这行代码中的日期）
+    // 原代码是 2026/03/20，这里保持原样，你可以改为你们的纪念日，格式如 '2023/08/01 00:00:00'
+    const startDate = new Date('2026/03/20 00:30:00');
+
+    function updateTimer() {
+        const now = new Date();
+        const diff = now - startDate;
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        document.getElementById('days').textContent = days;
+        document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+        document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+        document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+    }
+    updateTimer();
+    setInterval(updateTimer, 1000);
+
+    // 音乐播放控制
+    const audio = new Audio('./media/AThousandsYears.mp3');
+
+    // 防止重复创建多个音频实例
+    audio.loop = true; // 设置循环播放
+
+    let isPlaying = false;
+    const musicBtn = document.getElementById('musicBtn');
+
+    musicBtn.addEventListener('click', () => {
+        if (!isPlaying) {
+            // 尝试播放
+            audio.play().catch(e => console.log("播放失败，通常是因为浏览器需要用户先与页面交互:", e));
+            isPlaying = true;
+            musicBtn.classList.add('playing');
+            musicBtn.textContent = '⏸️';
+        } else {
+            audio.pause();
+            isPlaying = false;
+            musicBtn.classList.remove('playing');
+            musicBtn.textContent = '🎵';
+        }
+    });
+</script>
+</body>
+</html>
